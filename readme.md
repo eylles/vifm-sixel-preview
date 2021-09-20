@@ -62,5 +62,7 @@ All previews are cached (except for regular images) and stored in your **~/.cach
 * [fontpreview](https://github.com/sdushantha/fontpreview)
 
 ## Credits
+
 [vifmimg](https://github.com/cirala/vifmimg)
+
 [show-sixel](https://github.com/vifm/vifm/issues/419#issuecomment-485918513)

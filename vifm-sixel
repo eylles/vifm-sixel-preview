@@ -1,0 +1,63 @@
+#!/bin/sh
+
+[ -d "$HOME/.cache/vifm" ] || mkdir -p "$HOME/.cache/vifm"
+
+# $1 action 
+action="$1"
+# $2 panel width
+panel_width=$(($2*6))
+# $3 panel height
+panel_height=$(($3*14))
+# $4 image path
+image_file="$4"
+
+PCACHE="$HOME/.cache/vifm/thumbnail.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$PWD/$image_file")" | sha256sum | awk '{print $1}')"
+
+cleanup() {
+    printf '\e\\'		# Escape sequence to stop SIXEL.
+    stty echo			# Reset terminal to show characters.
+    exit 0
+}
+
+# recieves image with height
+image() {
+    convert "$1" -geometry "${2}x${3}" sixel:-
+  }
+
+
+case "$action" in
+  "clear")
+    cleanup
+    ;;
+  "draw")
+    [ ! -f "${PCACHE}.jpg" ] && convert "$image_file"'[0]' "${PCACHE}.jpg"
+    # FILE="$PWD/$image_file"
+    image "${PCACHE}.jpg" "$panel_width" "$panel_height"
+    ;;
+  "video")
+    [ ! -f "${PCACHE}.jpg" ] && \
+    ffmpegthumbnailer -i "$4" -o "${PCACHE}.jpg" -s 0 -q 5
+    image "${PCACHE}.jpg" "$panel_width" "$panel_height"
+    ;;
+  "epub")
+    [ ! -f "${PCACHE}.jpg" ] && \
+    epub-thumbnailer "$image_file" "$PCACHE" 1024
+    image "${PCACHE}.jpg" "$panel_width" "$panel_height"
+    ;;
+  "pdf")
+    [ ! -f "${PCACHE}.jpg" ] && \
+    pdftoppm -jpeg -f 1 -singlefile "$image_file" "$PCACHE"
+    image "${PCACHE}.jpg" "$panel_width" "$panel_height"
+    ;;
+  "audio")
+    [ ! -f "${PCACHE}.jpg" ] && \
+    ffmpeg -i "$image_file" "${PCACHE}.jpg" -y >/dev/null
+    image "${PCACHE}.jpg" "$panel_width" "$panel_height"
+    ;;
+  "font")
+    [ ! -f "${PCACHE}.jpg" ] && \
+    fontpreview -i "$image_file" -o "${PCACHE}.jpg"
+    image "${PCACHE}.jpg" "$panel_width" "$panel_height"
+    ;;
+  *)
+esac

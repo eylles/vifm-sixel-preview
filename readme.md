@@ -61,6 +61,11 @@ All previews are cached (except for regular images) and stored in your **~/.cach
 * [epub-thumbnailer](https://github.com/marianosimone/epub-thumbnailer)
 * [fontpreview](https://github.com/sdushantha/fontpreview)
 
+## TODO
+* try to autodetect col and row pixel size (apparently can only be done for xterm and mlterm)
+* use montage to center the image over the correct preview panel bg color (will have to take code from lsix)
+
+
 ## Credits
 
 [vifmimg](https://github.com/cirala/vifmimg)

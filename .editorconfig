@@ -14,6 +14,8 @@ charset = utf-8
 indent_style = space
 # same tab size as kernel style
 indent_size = 4
+[Makefile]
+indent_style = tab
 
 # no trailing spaces
 trim_trailing_whitespace = true

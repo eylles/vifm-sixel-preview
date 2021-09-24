@@ -2,7 +2,7 @@
 
 [ -d "$HOME/.cache/vifm" ] || mkdir -p "$HOME/.cache/vifm"
 
-# $1 action 
+# $1 action
 action="$1"
 # $2 panel width
 panel_width=$(($2*6))
@@ -14,14 +14,14 @@ image_file="$4"
 PCACHE="$HOME/.cache/vifm/thumbnail.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$PWD/$image_file")" | sha256sum | awk '{print $1}')"
 
 cleanup() {
-    printf '\e\\'		# Escape sequence to stop SIXEL.
-    stty echo			# Reset terminal to show characters.
+    printf '\33[s\33[5A\33[2K\33[u'
+    clear
     exit 0
 }
 
 # recieves image with height
 image() {
-    convert "$1" -geometry "${2}x${3}" sixel:-
+    montage "$1" -geometry "${2}x${3}" sixel:-
   }
 
 

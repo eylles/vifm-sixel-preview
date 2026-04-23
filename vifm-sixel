@@ -35,23 +35,23 @@ case "$action" in
     cleanup
     ;;
   "draw")
-    [ ! -f "${PCACHE}.jpg" ] && convert "$image_file"'[0]' "${PCACHE}.jpg"
+    [ ! -f "${PCACHE}.jpg" ] && convert "$image_file"'[0]' "${PCACHE}.jpg" 2> /dev/null
     # FILE="$PWD/$image_file"
     image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
     ;;
   "video")
     [ ! -f "${PCACHE}.jpg" ] && \
-    ffmpegthumbnailer -i "$4" -o "${PCACHE}.jpg" -s 0 -q 5
+    ffmpegthumbnailer -i "$4" -o "${PCACHE}.jpg" -s 0 -q 5 2> /dev/null
     image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
     ;;
   "epub")
     [ ! -f "${PCACHE}.jpg" ] && \
-    epub-thumbnailer "$image_file" "$PCACHE" 1024
+    epub-thumbnailer "$image_file" "$PCACHE" 1024 2> /dev/null
     image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
     ;;
   "pdf")
     [ ! -f "${PCACHE}.jpg" ] && \
-    pdftoppm -jpeg -f 1 -singlefile "$image_file" "$PCACHE"
+    pdftoppm -jpeg -f 1 -singlefile "$image_file" "$PCACHE" 2> /dev/null
     image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
     ;;
   "audio")
@@ -61,7 +61,7 @@ case "$action" in
     ;;
   "font")
     [ ! -f "${PCACHE}.jpg" ] && \
-    fontpreview -i "$image_file" -o "${PCACHE}.jpg"
+    fontpreview -i "$image_file" -o "${PCACHE}.jpg" 2> /dev/null
     image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
     ;;
   *)

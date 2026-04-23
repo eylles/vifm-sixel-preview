@@ -1,30 +1,26 @@
-# EditorConfig
-
-# apply to all files
-[*]
-
-# top-most EditorConfig file
+# Don't search for other .editconfig files
 root = true
 
-# Set default charset
-charset = utf-8
+[*]
 
-# Indentation
-# indent with spaces
-indent_style = space
-# same tab size as kernel style
-indent_size = 4
-[Makefile]
-indent_style = tab
+# Unix-style newlines
+end_of_line = lf
 
-# no trailing spaces
-trim_trailing_whitespace = true
-
-# line lenght, same as kernel stipulated
-max_line_length = 100
-
-# all files have a final line
+# There a newline at the end of the file
 insert_final_newline = true
 
-# end of line
-end_of_line = lf
+# Trailing whitespaces, no one needs them
+trim_trailing_whitespace = true
+
+# Why would anyone use anything else?
+charset = utf-8
+
+# This is just what i like, sorry if you disagree
+indent_style = space
+indent_size = 2
+
+# line length, same as linux kernel stipulated
+max_line_length = 100
+
+[Makefile]
+indent_style = tab

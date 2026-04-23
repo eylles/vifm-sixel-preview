@@ -26,7 +26,7 @@ cleanup() {
 
 # recieves image with height
 image() {
-    montage "$1" -background "$background" -geometry "${2}x${3}" sixel:-
+    montage "$1" -background "$background" -geometry "${2}x${3}" sixel:- 2> /dev/null
   }
 
 
@@ -37,32 +37,32 @@ case "$action" in
   "draw")
     [ ! -f "${PCACHE}.jpg" ] && convert "$image_file"'[0]' "${PCACHE}.jpg" 2> /dev/null
     # FILE="$PWD/$image_file"
-    image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
+    image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "video")
     [ ! -f "${PCACHE}.jpg" ] && \
     ffmpegthumbnailer -i "$4" -o "${PCACHE}.jpg" -s 0 -q 5 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
+    image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "epub")
     [ ! -f "${PCACHE}.jpg" ] && \
     epub-thumbnailer "$image_file" "$PCACHE" 1024 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
+    image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "pdf")
     [ ! -f "${PCACHE}.jpg" ] && \
     pdftoppm -jpeg -f 1 -singlefile "$image_file" "$PCACHE" 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
+    image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "audio")
     [ ! -f "${PCACHE}.jpg" ] && \
     ffmpeg -i "$image_file" "${PCACHE}.jpg" -y >/dev/null
-    image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
+    image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "font")
     [ ! -f "${PCACHE}.jpg" ] && \
     fontpreview -i "$image_file" -o "${PCACHE}.jpg" 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height" 2> /dev/null
+    image "${PCACHE}.jpg" "$width" "$height"
     ;;
   *)
 esac

@@ -32,6 +32,39 @@ fi
 # runtime #
 ###########
 
+CacheDimN=256
+CacheDimL=512
+CacheDimX=1024
+CacheDim=""
+
+get_max() {
+  if [ "$1" -gt "$2" ]; then
+    echo "$1"
+  else
+    echo "$2"
+  fi
+}
+
+get_min() {
+  if [ "$1" -lt "$2" ]; then
+    echo "$1"
+  else
+    echo "$2"
+  fi
+}
+
+get_thumbnail_name () {
+    filepath=$(realpath "$1")
+    perl -MURI::file -MDigest::MD5=md5_hex \
+        -e 'printf "%s.png\n", md5_hex(URI::file->new(shift))' "$filepath"
+}
+
+CacheBaseDir="${XDG_CACHE_HOME:-$HOME/.cache}/thumbnails"
+CacheN="${CacheBaseDir}/large"
+CacheL="${CacheBaseDir}/x-large"
+CacheX="${CacheBaseDir}/xx-large"
+UseCacheDir=""
+
 [ -d "$HOME/.cache/vifm" ] || mkdir -p "$HOME/.cache/vifm"
 
 # $1 action
@@ -42,10 +75,28 @@ panel_width=$2
 panel_height=$3
 width=$((panel_width*cell_width))
 height=$((panel_height*cell_height))
-# absolute image path
-image_file="$PWD/$4"
 
-PCACHE="$HOME/.cache/vifm/thumbnail.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$image_file")" | sha256sum | awk '{print $1}')"
+MaxDispDim=$(get_max "$width" "$height")
+
+if [ "$MaxDispDim" -lt "$CacheDimN" ]; then
+  CacheDim="$CacheDimN"
+  UseCacheDir="$CacheN"
+elif [ "$MaxDispDim" -lt "$CacheDimL" ]; then
+  CacheDim="$CacheDimL"
+  UseCacheDir="$CacheL"
+else
+  CacheDim="$CacheDimX"
+  UseCacheDir="$CacheX"
+fi
+
+CxC="${CacheDim}x${CacheDim}"
+
+# absolute image path
+file="$PWD/$4"
+
+CacheFile=$(get_thumbnail_name "$file")
+
+CachePath="${UseCacheDir}/${CacheFile}"
 
 cleanup() {
     printf '\33[s\33[5A\33[2K\33[u'
@@ -64,34 +115,33 @@ case "$action" in
     cleanup
     ;;
   "draw")
-    [ ! -f "${PCACHE}.jpg" ] && convert "$image_file"'[0]' "${PCACHE}.jpg" 2> /dev/null
-    # FILE="$PWD/$image_file"
+    [ ! -f "$CachePath" ] && convert "$file"'[0]' -resize "$CxC" "$CachePath" 2> /dev/null
     image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "video")
-    [ ! -f "${PCACHE}.jpg" ] && \
-    ffmpegthumbnailer -i "$image_file" -o "${PCACHE}.jpg" -s 0 -q 5 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height"
+    [ ! -f "$CachePath" ] && \
+    ffmpegthumbnailer -i "$file" -o "$CachePath" -s "$CacheDim"  -q 5 2> /dev/null
+    image "$CachePath" "$width" "$height"
     ;;
   "epub")
-    [ ! -f "${PCACHE}.jpg" ] && \
-    epub-thumbnailer "$image_file" "$PCACHE" 1024 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height"
+    [ ! -f "$CachePath" ] && \
+    epub-thumbnailer "$file" "$CachePath" "$CacheDim" 2> /dev/null
+    image "$CachePath" "$width" "$height"
     ;;
   "pdf")
-    [ ! -f "${PCACHE}.jpg" ] && \
-    pdftoppm -jpeg -f 1 -singlefile "$image_file" "$PCACHE" 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height"
+    [ ! -f "$CachePath" ] && \
+    pdftoppm -png -f 1 -singlefile -scale-to "$CacheDim" "$file" "$CachePath" 2> /dev/null
+    image "$CachePath" "$width" "$height"
     ;;
   "audio")
-    [ ! -f "${PCACHE}.jpg" ] && \
-    ffmpeg -i "$image_file" "${PCACHE}.jpg" -y >/dev/null
-    image "${PCACHE}.jpg" "$width" "$height"
+    [ ! -f "$CachePath" ] && \
+    ffmpeg -i "$file" "$CachePath" -y >/dev/null
+    image "$CachePath" "$width" "$height"
     ;;
   "font")
     [ ! -f "${PCACHE}.jpg" ] && \
-    fontpreview -i "$image_file" -o "${PCACHE}.jpg" 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height"
+    fontpreview --size "$CxC" -i "$file" -o "$CachePath" 2> /dev/null
+    image "$CachePath" "$width" "$height"
     ;;
   *)
 esac

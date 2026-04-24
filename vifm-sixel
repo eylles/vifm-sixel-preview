@@ -42,10 +42,10 @@ panel_width=$2
 panel_height=$3
 width=$((panel_width*cell_width))
 height=$((panel_height*cell_height))
-# $4 image path
-image_file="$4"
+# absolute image path
+image_file="$PWD/$4"
 
-PCACHE="$HOME/.cache/vifm/thumbnail.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$PWD/$image_file")" | sha256sum | awk '{print $1}')"
+PCACHE="$HOME/.cache/vifm/thumbnail.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$image_file")" | sha256sum | awk '{print $1}')"
 
 cleanup() {
     printf '\33[s\33[5A\33[2K\33[u'
@@ -70,7 +70,7 @@ case "$action" in
     ;;
   "video")
     [ ! -f "${PCACHE}.jpg" ] && \
-    ffmpegthumbnailer -i "$4" -o "${PCACHE}.jpg" -s 0 -q 5 2> /dev/null
+    ffmpegthumbnailer -i "$image_file" -o "${PCACHE}.jpg" -s 0 -q 5 2> /dev/null
     image "${PCACHE}.jpg" "$width" "$height"
     ;;
   "epub")

@@ -1,5 +1,37 @@
 #!/bin/bash
 
+################
+# configurable #
+################
+cell_width=6
+cell_height=14
+background=black
+
+ConfDir="${XDG_CONFIG_HOME:-${HOME}/.config}/vifm"
+CONFIG="${ConfDir}/sixel-preview.conf"
+
+if [ ! -r "$CONFIG" ]; then
+  cat << __HEREDOC__ >> "$CONFIG"
+# vim: ft=sh
+# vifm sizel preview config file
+
+# background color for the image preview
+# this should be in a format recognizable by ImageMagick
+background="${background}"
+
+# width of the terminal cell in pixels
+cell_width="${cell_width}"
+# height of the terminal cell in pixels
+cell_height="${cell_height}"
+__HEREDOC__
+else
+  . "$CONFIG"
+fi
+
+###########
+# runtime #
+###########
+
 [ -d "$HOME/.cache/vifm" ] || mkdir -p "$HOME/.cache/vifm"
 
 # $1 action
@@ -8,13 +40,10 @@ action="$1"
 # $3 panel height
 panel_width=$2
 panel_height=$3
-cell_width=6
-cell_height=14
 width=$((panel_width*cell_width))
 height=$((panel_height*cell_height))
 # $4 image path
 image_file="$4"
-background=black
 
 PCACHE="$HOME/.cache/vifm/thumbnail.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$PWD/$image_file")" | sha256sum | awk '{print $1}')"
 

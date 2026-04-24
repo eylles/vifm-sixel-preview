@@ -56,6 +56,7 @@ All previews are cached (except for regular images) and stored in your **~/.cach
 
 ## Prerequisites
 * bash
+* perl (for xdg cache compliance)
 * [ffmpegthumbnailer](https://github.com/dirkvdb/ffmpegthumbnailer)
 * ImageMagick
 * pdftoppm (Available in the AUR as **poppler** package.)

@@ -98,6 +98,23 @@ CacheFile=$(get_thumbnail_name "$file")
 
 CachePath="${UseCacheDir}/${CacheFile}"
 
+# Type: int
+# value: 0
+_true=0
+# Type: int
+# value: 1
+_false=1
+
+check_cache() {
+    # check if cache file exists
+    [ ! -f "$1" ] && return "$_false"
+
+    # Check if original file is newer than cache
+    [ "$file" -nt "$1" ] && return "$_false"
+
+    return "$_true"
+}
+
 cleanup() {
     printf '\33[s\33[5A\33[2K\33[u'
     clear
@@ -115,32 +132,37 @@ case "$action" in
     cleanup
     ;;
   "draw")
-    [ ! -f "$CachePath" ] && convert "$file"'[0]' -resize "$CxC" "$CachePath" 2> /dev/null
-    image "${PCACHE}.jpg" "$width" "$height"
+    if ! check_cache "$CachePath"; then
+      convert "$file"'[0]' -resize "$CxC" "$CachePath" 2> /dev/null
+    fi
+    image "$CachePath" "$width" "$height"
     ;;
   "video")
-    [ ! -f "$CachePath" ] && \
-    ffmpegthumbnailer -i "$file" -o "$CachePath" -s "$CacheDim"  -q 5 2> /dev/null
+    if ! check_cache "$CachePath"; then
+      ffmpegthumbnailer -i "$file" -o "$CachePath" -s "$CacheDim"  -q 5 2> /dev/null
+    fi
     image "$CachePath" "$width" "$height"
     ;;
   "epub")
-    [ ! -f "$CachePath" ] && \
     epub-thumbnailer "$file" "$CachePath" "$CacheDim" 2> /dev/null
     image "$CachePath" "$width" "$height"
     ;;
   "pdf")
-    [ ! -f "$CachePath" ] && \
-    pdftoppm -png -f 1 -singlefile -scale-to "$CacheDim" "$file" "$CachePath" 2> /dev/null
+    if ! check_cache "$CachePath"; then
+      pdftoppm -png -f 1 -singlefile -scale-to "$CacheDim" "$file" "$CachePath" 2> /dev/null
+    fi
     image "$CachePath" "$width" "$height"
     ;;
   "audio")
-    [ ! -f "$CachePath" ] && \
-    ffmpeg -i "$file" "$CachePath" -y >/dev/null
+    if ! check_cache "$CachePath"; then
+      ffmpeg -i "$file" "$CachePath" -y >/dev/null
+    fi
     image "$CachePath" "$width" "$height"
     ;;
   "font")
-    [ ! -f "${PCACHE}.jpg" ] && \
-    fontpreview --size "$CxC" -i "$file" -o "$CachePath" 2> /dev/null
+    if ! check_cache "$CachePath"; then
+      fontpreview --size "$CxC" -i "$file" -o "$CachePath" 2> /dev/null
+    fi
     image "$CachePath" "$width" "$height"
     ;;
   *)

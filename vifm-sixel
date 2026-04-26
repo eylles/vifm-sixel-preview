@@ -132,10 +132,17 @@ case "$action" in
     cleanup
     ;;
   "draw")
-    if ! check_cache "$CachePath"; then
-      convert "$file"'[0]' -resize "$CxC" "$CachePath" 2> /dev/null
-    fi
-    image "$CachePath" "$width" "$height"
+    case "$(realpath "$PWD")" in
+      *"$CacheBaseDir"*)
+        image "$file" "$width" "$height"
+        ;;
+      *)
+        if ! check_cache "$CachePath"; then
+          convert "$file"'[0]' -resize "$CxC" "$CachePath" 2> /dev/null
+        fi
+        image "$CachePath" "$width" "$height"
+        ;;
+    esac
     ;;
   "video")
     if ! check_cache "$CachePath"; then

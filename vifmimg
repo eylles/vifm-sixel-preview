@@ -113,7 +113,7 @@ cleanup() {
 
 # recieves image with height
 image() {
-    montage "$1" -background "$background" -geometry "${2}x${3}" sixel:-
+    montage "$1" -background "$background" -geometry "${2}x${3}" sixel:- 2>/dev/null
   }
 
 case "$action" in

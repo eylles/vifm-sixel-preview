@@ -22,36 +22,38 @@ All previews are cached (except for regular images) and stored in your **~/.cach
 4. Edit your **~/.config/vifm/vifmrc** file and add fileviewer properties like so:
 ```
     fileviewer *.pdf
-        \ vifm-sixel pdf %pw %ph %c %pd
+        \ vifmimg pdf %pw %ph %c %pd
         \ %pc
-        \ vifm-sixel clear
+        \ vifmimg clear
 
     fileviewer *.epub
-        \ vifm-sixel epub %pw %ph %c %pd
+        \ vifmimg epub %pw %ph %c %pd
         \ %pc
-        \ vifm-sixel clear
+        \ vifmimg clear
 
     fileviewer <video/*>
-        \ vifm-sixel video %pw %ph %c %pd
+        \ vifmimg video %pw %ph %c %pd
         \ %pc
-        \ vifm-sixel clear
+        \ vifmimg clear
 
     fileviewer <image/*>
-        \ vifm-sixel draw %pw %ph %c %pd
+        \ vifmimg draw %pw %ph %c %pd
         \ %pc
-        \ vifm-sixel clear
+        \ vifmimg clear
 
     fileviewer <audio/*>
-        \ vifm-sixel audio %pw %ph %c %pd
+        \ vifmimg audio %pw %ph %c %pd
         \ %pc
-        \ vifm-sixel clear
+        \ vifmimg clear
 
     fileviewer <font/*>
-        \ vifm-sixel font %pw %ph %c %pd
+        \ vifmimg font %pw %ph %c %pd
         \ %pc
-        \ vifm-sixel clear
+        \ vifmimg clear
 
 ```
+
+now you can run vifmrun and get this working
 
 
 ## Prerequisites
@@ -63,10 +65,13 @@ All previews are cached (except for regular images) and stored in your **~/.cach
 * [epub-thumbnailer](https://github.com/marianosimone/epub-thumbnailer)
 * [fontpreview](https://github.com/sdushantha/fontpreview)
 
-## TODO
-* try to autodetect col and row pixel size (apparently can only be done for xterm and mlterm)
-* use montage to center the image over the correct preview panel bg color (will have to take code from lsix)
+## notes
 
+In spite of the scripts being named vifmrun and vifmimg now it is not a 1 to 1 direct drop in
+replacement to vifmimg, as you can see from the configuration and the macros given to be expanded as
+arguments to the command being not exactly the same as for vifmimg, another key difference is the
+usage of `%pd` which is to tell vifm that direct output is going to the terminal, so that sixels can
+be displayed, this macro breaks with vifm.
 
 ## Credits
 

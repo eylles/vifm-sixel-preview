@@ -1,31 +1,21 @@
 #!/bin/bash
 
-################
-# configurable #
-################
 cell_width=6
 cell_height=14
 background=black
 
-ConfDir="${XDG_CONFIG_HOME:-${HOME}/.config}/vifm"
-CONFIG="${ConfDir}/sixel-preview.conf"
+PropsCacheDir="${XDG_CACHE_HOME:-$HOME/.cache}/vifm-sixel-preview"
 
-if [ ! -r "$CONFIG" ]; then
-  cat << __HEREDOC__ >> "$CONFIG"
-# vim: ft=sh
-# vifm sizel preview config file
-
-# background color for the image preview
-# this should be in a format recognizable by ImageMagick
-background="${background}"
-
-# width of the terminal cell in pixels
-cell_width="${cell_width}"
-# height of the terminal cell in pixels
-cell_height="${cell_height}"
-__HEREDOC__
+if [ -r "$PROPSFILE" ]; then
+  . "$PROPSFILE"
 else
-  . "$CONFIG"
+  for pfile in "$PropsCacheDir"/*; do
+    if [ -r "$pfile" ]; then
+      . "$pfile"
+      break
+    fi
+  done
+  unset pfile
 fi
 
 ###########
@@ -123,9 +113,8 @@ cleanup() {
 
 # recieves image with height
 image() {
-    montage "$1" -background "$background" -geometry "${2}x${3}" sixel:- 2> /dev/null
+    montage "$1" -background "$background" -geometry "${2}x${3}" sixel:-
   }
-
 
 case "$action" in
   "clear")

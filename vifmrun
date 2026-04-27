@@ -1,0 +1,210 @@
+#!/bin/bash
+
+VIFMEXEC=/usr/bin/vifm
+
+################
+# configurable #
+################
+cell_width=6
+cell_height=14
+background=black
+
+ConfDir="${XDG_CONFIG_HOME:-${HOME}/.config}/vifm"
+CONFIG="${ConfDir}/sixel-preview.conf"
+
+if [ ! -r "$CONFIG" ]; then
+  cat << __HEREDOC__ >> "$CONFIG"
+# vim: ft=sh
+# vifm sizel preview config file
+
+# background color for the image preview
+# this should be in a format recognizable by ImageMagick
+background="${background}"
+
+# width of the terminal cell in pixels
+cell_width="${cell_width}"
+# height of the terminal cell in pixels
+cell_height="${cell_height}"
+__HEREDOC__
+else
+  . "$CONFIG"
+fi
+
+PropsCacheDir="${XDG_CACHE_HOME:-$HOME/.cache}/vifm-sixel-preview"
+if [ ! -d "$PropsCacheDir" ]; then
+  mkdir -p "$PropsCacheDir"
+fi
+PROPSFILE="$PropsCacheDir/$$"
+: > "$PROPSFILE"
+export PROPSFILE
+
+
+cleanup() {
+  rm "$PROPSFILE" 2>/dev/null
+}
+
+runvifm() {
+  if [ -z "$1"  ]; then
+    $VIFMEXEC "$PWD" "$HOME"
+  else
+    $VIFMEXEC "$1" "$HOME"
+  fi
+  vifmimg clear
+  cleanup
+}
+
+write_props() {
+  {
+    printf '%s=%s\n'  "cell_width" "$1"
+    printf '%s=%s\n' "cell_height" "$2"
+    printf '%s=%s\n'  "background" "$3"
+  } > "$PROPSFILE"
+}
+
+# unix command line compatible booleans
+
+# Type: int
+# value: 0
+_true=0
+# Type: int
+# value: 1
+_false=1
+
+get_max() {
+  if [ "$1" -gt "$2" ]; then
+    echo "$1"
+  else
+    echo "$2"
+  fi
+}
+
+get_min() {
+  if [ "$1" -lt "$2" ]; then
+    echo "$1"
+  else
+    echo "$2"
+  fi
+}
+
+timeout=0.25  # How long to wait for terminal to respond
+              # to a control sequence (in seconds).
+
+# Various terminal automatic configuration routines.
+
+# Don't show escape sequences the terminal doesn't understand.
+stty -echo			# Hush-a Mandara Ni Pari
+
+is_term_sixel_capable() {
+    hassixel="$_false"
+    old_ifs=$IFS
+    IFS=";" read -a REPLY -s -t 1 -d "c" -p $'\e[c' >&2
+    for code in "${REPLY[@]}"; do
+        if [[ $code == "4" ]]; then
+            hassixel="$_true"
+            # break
+        fi
+    done
+    IFS=$old_ifs
+    return "$hassixel"
+}
+
+get_sixel_max_geometry() {
+  SixelMaxGeometry=0x0
+  # Send control sequence to query the sixel graphics geometry to
+  # find out how large of a sixel image can be shown.
+  old_ifs=$IFS
+  IFS=";"  read -a REPLY -s -t ${timeout} -d "S" -p $'\e[?2;1;0S' >&2
+  if [[ ${REPLY[2]} -gt 0 ]]; then
+    SixelMaxGeometry=${REPLY[2]}"x"${REPLY[3]}
+  fi
+  IFS=$old_ifs
+  echo "$SixelMaxGeometry"
+}
+
+get_term_pixel_dims() {
+  TerminalPixelDimensions=0x0
+  old_ifs=$IFS
+  IFS=";" read -a REPLY -s -t ${timeout} -d "t" -p $'\e[14t' >&2
+  TerminalPixelDimensions=${REPLY[2]}"x"${REPLY[1]}
+  IFS=$old_ifs
+  echo "$TerminalPixelDimensions"
+}
+
+get_term_char_dims() {
+  TerminalCharDimensions=0x0
+  # returns ^[4;height;width
+  old_ifs=$IFS
+  IFS=";" read -a REPLY -s -t ${timeout} -d "t" -p $'\e[18t' >&2
+  TerminalCharDimensions=${REPLY[2]}"x"${REPLY[1]}
+  IFS=$old_ifs
+  echo "$TerminalCharDimensions"
+}
+
+get_term_cell_dims() {
+  TerminalCellPixelDimensions=0x0
+  # returns ^[4;height;width
+  old_ifs=$IFS
+  IFS=";" read -a REPLY -s -t ${timeout} -d "t" -p $'\e[16t' >&2
+  TerminalCellPixelDimensions=${REPLY[2]}"x"${REPLY[1]}
+  IFS=$old_ifs
+  echo "$TerminalCellPixelDimensions"
+}
+
+get_cell_pix() {
+  CellPix=0x0
+  CellPix=$(get_term_cell_dims)
+  case "$CellPix" in
+    'x'|'0x0')
+      TPix=$(get_term_pixel_dims)
+      TPixW="${TPix%%x*}"
+      TPixH="${TPix##*x}"
+
+      TCell=$(get_term_char_dims)
+      TCellW="${TCell%%x*}"
+      TCellH="${TCell##*x}"
+
+      CellWidth=$((TPixW*TCellW))
+      CellHeight=$((TPixH*TCellH))
+      CellPix="${CellWidth}x${CellHeight}"
+      ;;
+  esac
+  echo "$CellPix"
+}
+
+get_term_bg() {
+    Background="black"
+    old_ifs=$IFS
+    IFS=";:/"  read -a REPLY -r -s -t ${timeout} -d "\\" -p $'\e]11;?\e\\' >&2
+    if [[ ${REPLY[1]} =~ ^rgb ]]; then
+        # Return value format: $'\e]11;rgb:ffff/0000/ffff\e\\'.
+        # ImageMagick wants colors formatted as #ffff0000ffff.
+        Background='#'"${REPLY[2]}${REPLY[3]}${REPLY[4]%%$'\e'*}"
+    fi
+    IFS=$old_ifs
+    echo "$Background"
+}
+
+get_props() {
+  CellPix=$(get_cell_pix)
+  CW="${CellPix%%x*}"
+  CH="${CellPix##*x}"
+  if [ -n "$CW" ] && [ -n "$CH" ]; then
+    cell_width="$CW"
+    cell_height="$CH"
+  fi
+  BG=$(get_term_bg)
+  if [ -n "$BG" ]; then
+    background="$BG"
+  fi
+  write_props "$cell_width" "$cell_height" "$background"
+}
+
+
+if [ -z "$(command -v vifm)" ]; then
+	printf "vifm isn't installed on your system!\n"
+	exit 1
+else
+  get_props
+  trap get_props WINCH
+	runvifm "$@"
+fi

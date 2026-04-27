@@ -1,10 +1,14 @@
 .PHONY: install uninstall
+PREFIX = ${HOME}/.local
+BIN_LOC = $(DESTDIR)$(PREFIX)/bin
+
 install:
 	@echo installing
-	mkdir -p ~/.config/vifm/scripts
-	cp ./vifm-sixel ~/.config/vifm/scripts/vifm-sixel
-	chmod +x ~/.config/vifm/scripts/vifm-sixel
+	mkdir -p $(BIN_LOC)
+	cp vifmrun $(BIN_LOC)/vifmrun
+	cp vifmimg $(BIN_LOC)/vifmimg
 
 uninstall:
 	@echo uninstalling
-	rm ~/.config/vifm/vifm-sixel
+	rm -f $(BIN_LOC)/vifmrun
+	rm -f $(BIN_LOC)/vifmimg

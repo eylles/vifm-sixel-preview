@@ -36,6 +36,11 @@ All previews are cached (except for regular images) and stored in your **~/.cach
         \ %pc
         \ vifmimg clear
 
+    fileviewer <image/svg\+xml>
+        \ vifmimg svg %pw %ph %c %pd
+        \ %pc
+        \ vifmimg clear
+
     fileviewer <image/*>
         \ vifmimg draw %pw %ph %c %pd
         \ %pc

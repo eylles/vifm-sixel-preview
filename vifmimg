@@ -133,6 +133,12 @@ case "$action" in
         ;;
     esac
     ;;
+  "svg")
+    if ! check_cache "$CachePath"; then
+      convert "$file" -background none "$CachePath" 2> /dev/null
+    fi
+    image "$CachePath" "$width" "$height"
+    ;;
   "video")
     if ! check_cache "$CachePath"; then
       ffmpegthumbnailer -i "$file" -o "$CachePath" -s "$CacheDim"  -q 5 2> /dev/null

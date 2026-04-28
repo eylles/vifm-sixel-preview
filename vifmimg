@@ -55,8 +55,6 @@ CacheL="${CacheBaseDir}/x-large"
 CacheX="${CacheBaseDir}/xx-large"
 UseCacheDir=""
 
-[ -d "$HOME/.cache/vifm" ] || mkdir -p "$HOME/.cache/vifm"
-
 # $1 action
 action="$1"
 # $2 panel width
@@ -78,6 +76,8 @@ else
   CacheDim="$CacheDimX"
   UseCacheDir="$CacheX"
 fi
+
+[ ! -d "$UseCacheDir" ] && mkdir -p "$UseCacheDir"
 
 CxC="${CacheDim}x${CacheDim}"
 

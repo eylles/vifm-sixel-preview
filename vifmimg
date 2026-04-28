@@ -151,7 +151,7 @@ case "$action" in
     ;;
   "pdf")
     if ! check_cache "$CachePath"; then
-      pdftoppm -png -f 1 -singlefile -scale-to "$CacheDim" "$file" "$CachePath" 2> /dev/null
+      pdftoppm -png -f 1 -singlefile -scale-to "$CacheDim" "$file" "${CachePath%%.png}" 2> /dev/null
     fi
     image "$CachePath" "$width" "$height"
     ;;

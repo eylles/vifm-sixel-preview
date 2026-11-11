@@ -8,6 +8,7 @@ VIFMEXEC=/usr/bin/vifm
 cell_width=6
 cell_height=14
 background=black
+second_pane_dir="home"
 
 ConfDir="${XDG_CONFIG_HOME:-${HOME}/.config}/vifm"
 CONFIG="${ConfDir}/sixel-preview.conf"
@@ -25,6 +26,13 @@ background="${background}"
 cell_width="${cell_width}"
 # height of the terminal cell in pixels
 cell_height="${cell_height}"
+
+# default second pane dir
+# when starting a new vifm instance without arguments the default
+# behaviour is to open the first pane (focus pane) at the PWD path
+# while the second pane (unfocused pane) will open at HOME, here you
+# can choose if instead you want the second pane to be "home" or "pwd"
+second_pane_dir="$second_pane_dir"
 __HEREDOC__
 else
   . "$CONFIG"
@@ -45,9 +53,21 @@ cleanup() {
 
 runvifm() {
   if [ -z "$1"  ]; then
-    $VIFMEXEC "$PWD" "$HOME"
+    SPD=""
+    case "$second_pane_dir" in
+      "home")
+        SPD="$HOME"
+        ;;
+      "pwd")
+        SPD="$PWD"
+        ;;
+      *)
+        SPD="$PWD"
+        ;;
+    esac
+    $VIFMEXEC "$PWD" "$SPD"
   else
-    $VIFMEXEC "$1" "$HOME"
+    $VIFMEXEC "$@"
   fi
   vifmimg clear
   cleanup

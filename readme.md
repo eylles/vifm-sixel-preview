@@ -24,37 +24,37 @@ All previews are cached (except for regular images) and stored in your **~/.cach
     fileviewer *.pdf
         \ vifmimg pdf %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
     fileviewer *.epub
         \ vifmimg epub %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
     fileviewer <video/*>
         \ vifmimg video %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
     fileviewer <image/svg\+xml>
         \ vifmimg svg %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
     fileviewer <image/*>
         \ vifmimg draw %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
     fileviewer <audio/*>
         \ vifmimg audio %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
     fileviewer <font/*>
         \ vifmimg font %pw %ph %c %pd
         \ %pc
-        \ vifmimg clear
+        \ vifmimg clear %pw %ph %pd
 
 ```
 

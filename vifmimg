@@ -106,6 +106,9 @@ check_cache() {
 }
 
 cleanup() {
+    convert -size "${1}x${2}" xc:"$background" sixel:-
+    printf '\033c'
+    printf '\e[2J'
     printf '\33[s\33[5A\33[2K\33[u'
     clear
     exit 0
@@ -118,7 +121,7 @@ image() {
 
 case "$action" in
   "clear")
-    cleanup
+    cleanup "$width" "$height"
     ;;
   "draw")
     case "$(realpath "$PWD")" in

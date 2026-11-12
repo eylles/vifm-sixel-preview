@@ -21,11 +21,17 @@ in **${XDG_CACHE_HOME}/vifm-sixel-preview**
 2. `cd vifm-sixel-preview`
 3. `make install`
 
-4. Edit your **~/.config/vifm/vifmrc** file and add this snippet:
+4. Edit your **~/.config/vifm/vifmrc** file and add this snippet BEFORE the defviewer like so:
 ```
+" vifm configs
+
 if filereadable($VIFM . '/use_sixel_previews.vifm')
     source $VIFM/use_sixel_previews.vifm
 endif
+
+" other configs
+" default file viewer
+fileviewer * defviewer %c
 ```
 
 now you can run vifmrun and get this working

@@ -1,0 +1,35 @@
+" uncached vifm previews with vifm-sixel-preview
+fileviewer *.pdf
+    \ vifmimg pdf %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu
+
+fileviewer *.epub
+    \ vifmimg epub %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu
+
+fileviewer <video/*>
+    \ vifmimg video %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu
+
+fileviewer <image/svg\+xml>
+    \ vifmimg svg %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu
+
+fileviewer <image/*>
+    \ vifmimg draw %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu
+
+fileviewer <audio/*>
+    \ vifmimg audio %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu
+
+fileviewer <font/*>
+    \ vifmimg font %pw %ph %c %pd %pu
+    \ %pc
+    \ vifmimg clear %pw %ph %pd %pu

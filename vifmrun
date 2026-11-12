@@ -9,6 +9,7 @@ cell_width=6
 cell_height=14
 background=black
 second_pane_dir="home"
+use_uncached_preview="no"
 
 ConfDir="${XDG_CONFIG_HOME:-${HOME}/.config}/vifm"
 CONFIG="${ConfDir}/sixel-preview.conf"
@@ -33,10 +34,19 @@ cell_height="${cell_height}"
 # while the second pane (unfocused pane) will open at HOME, here you
 # can choose if instead you want the second pane to be "home" or "pwd"
 second_pane_dir="$second_pane_dir"
+
+# werether or not the uncached preview should be used
+# by default vifm caches the output of the preview commands, in some terminal emulators like foot
+# using cached previews of sixels may cause flicker.
+# possible values: yes, no
+# default: no
+use_uncached_preview="$use_uncached_preview"
 __HEREDOC__
 else
   . "$CONFIG"
 fi
+
+export use_uncached_preview
 
 PropsCacheDir="${XDG_CACHE_HOME:-$HOME/.cache}/vifm-sixel-preview"
 if [ ! -d "$PropsCacheDir" ]; then
@@ -52,6 +62,7 @@ cleanup() {
 }
 
 runvifm() {
+  export use_sixel="yes"
   if [ -z "$1"  ]; then
     SPD=""
     case "$second_pane_dir" in

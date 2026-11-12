@@ -2,7 +2,8 @@
 
 Kind of a clone of vifmimg but for sixel
 
-This script is used along [vifm](https://github.com/vifm/vifm) to generate image previews for various file types in vifm.
+This script is used along [vifm](https://github.com/vifm/vifm) to generate image previews for
+various file types in vifm.
 
 The script is currently able to handle the following formats:
 * Video
@@ -11,7 +12,8 @@ The script is currently able to handle the following formats:
 * Audio files
 * Fonts
 
-All previews are cached (except for regular images) and stored in your **~/.cache/vifm/** folder.
+All previews are cached in your **${XDG_CACHE_HOME}/thumbnails** folder with image properties cached
+in **${XDG_CACHE_HOME}/vifm-sixel-preview**
 
 
 ## Installation
@@ -19,43 +21,11 @@ All previews are cached (except for regular images) and stored in your **~/.cach
 2. `cd vifm-sixel-preview`
 3. `make install`
 
-4. Edit your **~/.config/vifm/vifmrc** file and add fileviewer properties like so:
+4. Edit your **~/.config/vifm/vifmrc** file and add this snippet:
 ```
-    fileviewer *.pdf
-        \ vifmimg pdf %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
-    fileviewer *.epub
-        \ vifmimg epub %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
-    fileviewer <video/*>
-        \ vifmimg video %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
-    fileviewer <image/svg\+xml>
-        \ vifmimg svg %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
-    fileviewer <image/*>
-        \ vifmimg draw %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
-    fileviewer <audio/*>
-        \ vifmimg audio %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
-    fileviewer <font/*>
-        \ vifmimg font %pw %ph %c %pd
-        \ %pc
-        \ vifmimg clear %pw %ph %pd
-
+if filereadable($VIFM . '/use_sixel_previews.vifm')
+    source $VIFM/use_sixel_previews.vifm
+endif
 ```
 
 now you can run vifmrun and get this working
@@ -73,10 +43,10 @@ now you can run vifmrun and get this working
 ## notes
 
 In spite of the scripts being named vifmrun and vifmimg now it is not a 1 to 1 direct drop in
-replacement to vifmimg, as you can see from the configuration and the macros given to be expanded as
-arguments to the command being not exactly the same as for vifmimg, another key difference is the
-usage of `%pd` which is to tell vifm that direct output is going to the terminal, so that sixels can
-be displayed, this macro breaks with vifm.
+replacement to vifmimg, tho i try to make it so the actual repo that will be able to work as a drop
+in replacement is [my personal fork of vifmimg](https://github.com/eylles/vifmimg/tree/myfork), as i
+try to sorta kinda keep them with equal capabilities as i find use of both image previewing scripts
+since i also maintain the old python ueberzug.
 
 ## Credits
 

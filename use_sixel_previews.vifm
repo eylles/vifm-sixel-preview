@@ -1,0 +1,12 @@
+" use sixel image previews in vifm
+if $use_sixel == 'yes'
+  if $use_uncached_preview == 'yes'
+    if filereadable($VIFM . '/preview/sixel_previews_uncached.vifm')
+      source $VIFM/preview/sixel_previews_uncached.vifm
+    endif
+  elseif $use_uncached_preview == 'no'
+    if filereadable($VIFM . '/preview/sixel_previews_regular.vifm')
+      source $VIFM/preview/sixel_previews_regular.vifm
+    endif
+  endif
+endif
